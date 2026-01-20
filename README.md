@@ -21,6 +21,25 @@ This repository hosts a blog that is automatically published via GitHub Pages.
 5.  Write your content below the header using Markdown.
 6.  Commit (save) and push your changes to GitHub.
 
+## Organizing Posts (Optional)
+
+You can organize your posts into folders to keep them tidy.
+Example: `_posts/2026/01/2026-01-20-my-post.md`
+
+## Adding Images
+
+1.  Add your image file to the `assets/images/` folder.
+2.  In your blog post, use this Markdown code to display it:
+    `![Description of image](/assets/images/your-image-name.jpg)`
+
+## Adding a Logo
+
+1.  Upload your logo image to `assets/images/`.
+2.  Open `_config.yml`.
+3.  Uncomment the `logo` line and set the path:
+    `logo: /assets/images/your-logo.png`
+
+
 ## Initial Setup (One Time Only)
 
 1.  Push this code to your GitHub repository.

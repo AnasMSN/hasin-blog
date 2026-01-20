@@ -4,3 +4,7 @@ theme: minima
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+
+# Logo settings
+logo: /assets/images/a.png
+
