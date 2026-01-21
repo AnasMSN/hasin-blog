@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Starting my blog"
+title:  "Become Serious in Lab"
 date:   2026-01-21 16:40:00 +0900
 categories: blog
 ---
