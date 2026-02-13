@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Need to change something"
-date:   2026-02-11 10:00:00 +0900
+title:  "Try different things today"
+date:   2026-02-12 10:00:00 +0900
 categories: blog
 ---
 
