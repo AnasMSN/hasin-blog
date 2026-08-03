@@ -1,0 +1,119 @@
+---
+export const prerender = false;
+
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { getOrCreateCsrfToken } from '../../../lib/csrf';
+
+const csrfToken = getOrCreateCsrfToken(Astro.cookies);
+const today = new Date().toISOString().slice(0, 10);
+---
+
+<AdminLayout title="New Post">
+  <div class="admin-topbar">
+    <a href="/admin">← Back to posts</a>
+  </div>
+  <div class="admin-shell">
+    <div class="admin-card">
+      <h1>New Post</h1>
+      <p id="form-error" class="admin-error" hidden></p>
+      <form id="post-form">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <label class="admin-field">
+          <span>Title</span>
+          <input name="title" type="text" required />
+        </label>
+        <label class="admin-field">
+          <span>Date</span>
+          <input name="date" type="date" value={today} required />
+        </label>
+        <label class="admin-field">
+          <span>Categories</span>
+          <input name="categories" type="text" placeholder="blog" value="blog" />
+        </label>
+        <label class="admin-field">
+          <span>Body</span>
+          <textarea id="body-editor" name="body_markdown"></textarea>
+        </label>
+        <button class="admin-button" type="submit">Publish</button>
+      </form>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  import EasyMDE from 'easymde';
+  import 'easymde/dist/easymde.min.css';
+
+  const textarea = document.getElementById('body-editor') as HTMLTextAreaElement;
+  const form = document.getElementById('post-form') as HTMLFormElement;
+  const errorEl = document.getElementById('form-error') as HTMLParagraphElement;
+
+  function getCsrfToken(): string {
+    return String(new FormData(form).get('csrf_token') ?? '');
+  }
+
+  const easyMDE = new EasyMDE({
+    element: textarea,
+    spellChecker: false,
+    status: false,
+    uploadImage: true,
+    imageMaxSize: 5 * 1024 * 1024,
+    imageAccept: 'image/png,image/jpeg,image/webp,image/gif',
+    imageUploadFunction: async (file, onSuccess, onError) => {
+      try {
+        const body = new FormData();
+        body.append('image', file);
+        body.append('csrf_token', getCsrfToken());
+        const res = await fetch('/api/admin/upload', { method: 'POST', body });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          onError(errBody.error || 'Upload failed.');
+          return;
+        }
+        const { url } = await res.json();
+        onSuccess(url);
+      } catch {
+        onError('Upload failed.');
+      }
+    },
+  });
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errorEl.hidden = true;
+
+    const data = new FormData(form);
+    const payload = {
+      title: String(data.get('title') ?? ''),
+      date: String(data.get('date') ?? ''),
+      categories: String(data.get('categories') ?? ''),
+      bodyMarkdown: easyMDE.value(),
+      csrfToken: getCsrfToken(),
+    };
+
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Publishing…';
+
+    try {
+      const res = await fetch('/api/admin/posts', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        window.location.href = '/admin';
+        return;
+      }
+      const body = await res.json().catch(() => ({}));
+      errorEl.textContent = body.error || 'Failed to publish post.';
+      errorEl.hidden = false;
+    } catch {
+      errorEl.textContent = 'Something went wrong. Please try again.';
+      errorEl.hidden = false;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Publish';
+    }
+  });
+</script>

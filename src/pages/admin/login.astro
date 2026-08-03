@@ -1,0 +1,90 @@
+---
+export const prerender = false;
+
+import { env } from 'cloudflare:workers';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getOrCreateCsrfToken } from '../../lib/csrf';
+
+const db = (env as unknown as { DB: D1Database }).DB;
+const csrfToken = getOrCreateCsrfToken(Astro.cookies);
+
+// There is only ever one admin account, so its salt can be embedded unconditionally
+// for client-side stretching. If no account exists yet (fresh install, before
+// `make admin-create` has been run), fall back to a fixed dummy salt so the page still
+// renders normally instead of erroring — login will just always fail in that case.
+const DUMMY_SALT = 'QURNSU5TRVRVUFBFTkRJTkc=';
+let salt = DUMMY_SALT;
+const row = await db.prepare('SELECT salt FROM admin_users LIMIT 1').first<{ salt: string }>();
+if (row?.salt) salt = row.salt;
+
+const hasError = Astro.url.searchParams.has('error');
+---
+
+<AdminLayout title="Log in">
+  <div class="admin-login-shell">
+    <div class="admin-card">
+      <h1>Admin Log in</h1>
+      {hasError && <p class="admin-error">Invalid username or password.</p>}
+      <form id="login-form">
+        <input type="hidden" name="csrf_token" value={csrfToken} />
+        <input type="hidden" name="salt" value={salt} />
+        <label class="admin-field">
+          <span>Username</span>
+          <input name="username" type="text" autocomplete="username" required />
+        </label>
+        <label class="admin-field">
+          <span>Password</span>
+          <input name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <p id="login-error" class="admin-error" hidden></p>
+        <button class="admin-button" type="submit">Log in</button>
+      </form>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  import { stretchPassword } from '../../lib/password';
+
+  const form = document.getElementById('login-form') as HTMLFormElement;
+  const errorEl = document.getElementById('login-error') as HTMLParagraphElement;
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    errorEl.hidden = true;
+
+    const data = new FormData(form);
+    const username = String(data.get('username') ?? '');
+    const password = String(data.get('password') ?? '');
+    const salt = String(data.get('salt') ?? '');
+    const csrfToken = String(data.get('csrf_token') ?? '');
+
+    const submitButton = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Verifying…';
+
+    try {
+      const stretched = await stretchPassword(password, salt);
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ username, stretched, csrfToken }),
+      });
+
+      if (res.ok) {
+        window.location.href = '/admin';
+        return;
+      }
+
+      const body = await res.json().catch(() => ({}));
+      errorEl.textContent = body.error || 'Invalid username or password.';
+      errorEl.hidden = false;
+    } catch {
+      errorEl.textContent = 'Something went wrong. Please try again.';
+      errorEl.hidden = false;
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Log in';
+    }
+  });
+</script>

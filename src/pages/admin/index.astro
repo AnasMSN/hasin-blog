@@ -1,0 +1,61 @@
+---
+export const prerender = false;
+
+import { env } from 'cloudflare:workers';
+import AdminLayout from '../../layouts/AdminLayout.astro';
+
+interface PostRow {
+  id: string;
+  slug: string;
+  title: string;
+  date: string;
+  categories: string;
+  published: number;
+}
+
+const db = (env as unknown as { DB: D1Database }).DB;
+const { results: posts } = await db
+  .prepare('SELECT id, slug, title, date, categories, published FROM posts ORDER BY date DESC, created_at DESC')
+  .all<PostRow>();
+
+const user = Astro.locals.user;
+---
+
+<AdminLayout title="Dashboard">
+  <div class="admin-topbar">
+    <a href="/admin">Admin</a>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <span>{user?.username}</span>
+      <form method="POST" action="/api/admin/logout">
+        <button class="admin-button admin-button-secondary" type="submit">Log out</button>
+      </form>
+    </div>
+  </div>
+  <div class="admin-shell">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+      <h1>Posts</h1>
+      <a class="admin-button" href="/admin/posts/new">+ New Post</a>
+    </div>
+    <div class="admin-card">
+      {
+        posts.length === 0 ? (
+          <p class="admin-empty">No posts yet.</p>
+        ) : (
+          <ul class="admin-post-list">
+            {posts.map((post) => (
+              <li>
+                <span>
+                  {post.title}
+                  {post.published ? '' : ' (draft)'}
+                </span>
+                <span class="admin-post-meta">
+                  {post.date} · {post.categories}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+</AdminLayout>

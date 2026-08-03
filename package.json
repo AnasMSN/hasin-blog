@@ -10,7 +10,11 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.1.7",
     "astro": "^7.1.6",
-    "@astrojs/cloudflare": "^14.1.7"
+    "easymde": "^2.21.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260801.1"
   }
 }
