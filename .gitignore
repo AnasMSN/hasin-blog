@@ -1,0 +1,12 @@
+# Astro / Node
+node_modules/
+dist/
+.astro/
+.env
+.env.production
+
+# Cloudflare
+.wrangler/
+
+# OS
+.DS_Store

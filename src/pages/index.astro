@@ -1,0 +1,14 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeContent from '../components/pages/HomeContent.astro';
+import { useTranslations } from '../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang} route="home" title={t('site.title')}>
+  <HomeContent lang={lang} />
+</BaseLayout>

@@ -1,0 +1,89 @@
+---
+import type { Lang } from '../../i18n/ui';
+import { useTranslations } from '../../i18n/utils';
+import { getCV } from '../../data/cv';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const cv = getCV(lang);
+---
+
+<section class="cv-hero">
+  <img src={cv.photo} alt={cv.name} width="112" height="112" />
+  <div>
+    <h1>{cv.name}</h1>
+    <p class="tagline">{cv.tagline}</p>
+    <div class="cv-contact">
+      <span>{t('home.contact.phone')}: {cv.contact.phone}</span>
+      <span>{t('home.contact.email')}: <a href={`mailto:${cv.contact.email}`}>{cv.contact.email}</a></span>
+      <span><a href={cv.contact.githubUrl} target="_blank" rel="noopener noreferrer">GitHub</a></span>
+      <span><a href={cv.contact.linkedinUrl} target="_blank" rel="noopener noreferrer">LinkedIn</a></span>
+    </div>
+  </div>
+</section>
+
+<section class="cv-section">
+  <h2>{t('home.section.education')}</h2>
+  {
+    cv.education.map((entry) => (
+      <div class="cv-entry">
+        <div class="cv-entry-head">
+          <h3>{entry.school}</h3>
+          <span class="cv-entry-meta">{entry.period} · GPA {entry.gpa}</span>
+        </div>
+        <p class="cv-entry-sub">{entry.degree}</p>
+        <ul>
+          {entry.details.map((d) => <li>{d}</li>)}
+        </ul>
+        {entry.extra?.map((block) => (
+          <p class="cv-entry-extra">
+            <strong>{block.heading}:</strong>{' '}
+            {block.items.length === 1 ? (
+              block.items[0]
+            ) : (
+              <ul>
+                {block.items.map((item) => <li>{item}</li>)}
+              </ul>
+            )}
+          </p>
+        ))}
+      </div>
+    ))
+  }
+</section>
+
+<section class="cv-section">
+  <h2>{t('home.section.skills')}</h2>
+  <div class="cv-skills-grid">
+    {
+      cv.skills.map((skill) => (
+        <div class="cv-skill-category">
+          <h3>{skill.category}</h3>
+          <p>{skill.items}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<section class="cv-section">
+  <h2>{t('home.section.experience')}</h2>
+  {
+    cv.experience.map((job) => (
+      <div class="cv-entry">
+        <div class="cv-entry-head">
+          <h3>{job.role}</h3>
+          <span class="cv-entry-meta">{job.period}</span>
+        </div>
+        <p class="cv-entry-sub">{job.company}</p>
+        <ul>
+          {job.bullets.map((b) => <li>{b}</li>)}
+        </ul>
+      </div>
+    ))
+  }
+</section>

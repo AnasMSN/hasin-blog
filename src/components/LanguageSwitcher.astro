@@ -1,0 +1,28 @@
+---
+import { languages, type Lang } from '../i18n/ui';
+import { getLocalizedRoute, type RouteKey } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  route: RouteKey;
+}
+
+const { lang, route } = Astro.props;
+const langCodes = Object.keys(languages) as Lang[];
+---
+
+<div class="lang-switcher" role="group" aria-label="Language">
+  {
+    langCodes.map((code, i) => (
+      <>
+        <a
+          href={getLocalizedRoute(code, route)}
+          aria-current={code === lang ? 'true' : undefined}
+        >
+          {languages[code]}
+        </a>
+        {i < langCodes.length - 1 && <span aria-hidden="true">·</span>}
+      </>
+    ))
+  }
+</div>

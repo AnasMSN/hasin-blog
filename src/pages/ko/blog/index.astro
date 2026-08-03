@@ -1,0 +1,14 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BlogContent from '../../../components/pages/BlogContent.astro';
+import { useTranslations } from '../../../i18n/utils';
+
+const lang = 'ko';
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang} route="blog" title={`${t('blog.title')} — ${t('site.title')}`}>
+  <BlogContent lang={lang} />
+</BaseLayout>

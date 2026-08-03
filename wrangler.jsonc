@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hasin-site",
+  "compatibility_date": "2026-04-15",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hasin-site-db",
+      // Placeholder until `make db-create` is run once (requires `npx wrangler login` first).
+      // Local dev works fine with this placeholder; it only needs to be real for remote/deploy use.
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "POST_IMAGES",
+      "bucket_name": "hasin-site-images"
+    }
+  ]
+}

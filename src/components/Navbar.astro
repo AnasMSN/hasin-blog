@@ -1,0 +1,42 @@
+---
+import type { Lang } from '../i18n/ui';
+import { useTranslations, getLocalizedRoute, type RouteKey } from '../i18n/utils';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+
+interface Props {
+  lang: Lang;
+  route: RouteKey;
+}
+
+const { lang, route } = Astro.props;
+const t = useTranslations(lang);
+
+const links: { key: RouteKey; label: string }[] = [
+  { key: 'home', label: t('nav.home') },
+  { key: 'portfolio', label: t('nav.portfolio') },
+  { key: 'blog', label: t('nav.blog') },
+];
+---
+
+<header class="site-header">
+  <div class="wrapper">
+    <a class="site-title" href={getLocalizedRoute(lang, 'home')}>{t('site.title')}</a>
+    <nav class="site-nav">
+      <ul class="nav-links">
+        {
+          links.map((link) => (
+            <li>
+              <a
+                href={getLocalizedRoute(lang, link.key)}
+                aria-current={route === link.key ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <LanguageSwitcher lang={lang} route={route} />
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,14 @@
+---
+export const prerender = true;
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PortfolioContent from '../../components/pages/PortfolioContent.astro';
+import { useTranslations } from '../../i18n/utils';
+
+const lang = 'en';
+const t = useTranslations(lang);
+---
+
+<BaseLayout lang={lang} route="portfolio" title={`${t('portfolio.title')} — ${t('site.title')}`}>
+  <PortfolioContent lang={lang} />
+</BaseLayout>
