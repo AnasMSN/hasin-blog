@@ -11,18 +11,23 @@ const { lang, route } = Astro.props;
 const langCodes = Object.keys(languages) as Lang[];
 ---
 
-<div class="lang-switcher" role="group" aria-label="Language">
-  {
-    langCodes.map((code, i) => (
-      <>
-        <a
-          href={getLocalizedRoute(code, route)}
-          aria-current={code === lang ? 'true' : undefined}
-        >
+<label class="lang-switcher">
+  <span class="sr-only">Language</span>
+  <select id="lang-select">
+    {
+      langCodes.map((code) => (
+        <option value={getLocalizedRoute(code, route)} selected={code === lang}>
           {languages[code]}
-        </a>
-        {i < langCodes.length - 1 && <span aria-hidden="true">·</span>}
-      </>
-    ))
-  }
-</div>
+        </option>
+      ))
+    }
+  </select>
+</label>
+
+<script>
+  document.querySelectorAll<HTMLSelectElement>('#lang-select').forEach((select) => {
+    select.addEventListener('change', () => {
+      window.location.href = select.value;
+    });
+  });
+</script>

@@ -12,7 +12,8 @@
   "dependencies": {
     "@astrojs/cloudflare": "^14.1.7",
     "astro": "^7.1.6",
-    "easymde": "^2.21.0"
+    "easymde": "^2.21.0",
+    "font-awesome": "^4.7.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260801.1"

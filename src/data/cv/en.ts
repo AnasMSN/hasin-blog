@@ -1,7 +1,7 @@
 import type { CVData } from './types';
 
 const contact = {
-  phone: '+62 813 1524 7621',
+  phone: '-',
   email: 'anas.mahasinnabih@gmail.com',
   github: 'AnasMSN',
   githubUrl: 'https://github.com/AnasMSN',

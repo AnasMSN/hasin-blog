@@ -141,8 +141,32 @@ body.admin {
 
 .editor-toolbar {
   border-color: var(--color-border);
+  background: var(--color-bg-subtle);
 }
 
 .editor-toolbar a {
   color: var(--color-text) !important;
+  min-width: 30px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 4px;
+}
+
+.editor-toolbar a.active,
+.editor-toolbar a:hover {
+  background: var(--color-border);
+  border-color: var(--color-border);
+}
+
+.editor-toolbar i.separator {
+  border-left-color: var(--color-border);
+  border-right-color: var(--color-border);
+}
+
+.editor-toolbar a::before {
+  font-size: 16px;
+}
+
+.CodeMirror-cursor {
+  border-left-color: var(--color-text);
 }

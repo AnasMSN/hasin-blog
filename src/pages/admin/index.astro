@@ -3,6 +3,7 @@ export const prerender = false;
 
 import { env } from 'cloudflare:workers';
 import AdminLayout from '../../layouts/AdminLayout.astro';
+import { getOrCreateCsrfToken } from '../../lib/csrf';
 
 interface PostRow {
   id: string;
@@ -19,6 +20,7 @@ const { results: posts } = await db
   .all<PostRow>();
 
 const user = Astro.locals.user;
+const csrfToken = getOrCreateCsrfToken(Astro.cookies);
 ---
 
 <AdminLayout title="Dashboard">
@@ -26,9 +28,9 @@ const user = Astro.locals.user;
     <a href="/admin">Admin</a>
     <div style="display:flex;align-items:center;gap:0.75rem;">
       <span>{user?.username}</span>
-      <form method="POST" action="/api/admin/logout">
-        <button class="admin-button admin-button-secondary" type="submit">Log out</button>
-      </form>
+      <button id="logout-button" class="admin-button admin-button-secondary" type="button" data-csrf-token={csrfToken}>
+        Log out
+      </button>
     </div>
   </div>
   <div class="admin-shell">
@@ -59,3 +61,25 @@ const user = Astro.locals.user;
     </div>
   </div>
 </AdminLayout>
+
+<script>
+  const logoutButton = document.getElementById('logout-button') as HTMLButtonElement;
+
+  logoutButton.addEventListener('click', async () => {
+    logoutButton.disabled = true;
+    try {
+      const res = await fetch('/api/admin/logout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ csrfToken: logoutButton.dataset.csrfToken }),
+      });
+      if (res.ok) {
+        window.location.href = '/admin/login';
+        return;
+      }
+    } catch {
+      // fall through to re-enable the button below
+    }
+    logoutButton.disabled = false;
+  });
+</script>
