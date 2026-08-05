@@ -8,6 +8,13 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   output: 'server',
   adapter: cloudflare(),
+  // We manage our own auth/session state in D1 (see src/lib/session.ts) and never use
+  // Astro's built-in Astro.session API. Without an explicit driver here, the Cloudflare
+  // adapter auto-provisions a KV namespace binding for that unused feature, which then
+  // fails to deploy because no real KV namespace backs it.
+  session: {
+    driver: 'memory',
+  },
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'ko', 'id'],
