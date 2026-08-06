@@ -16,7 +16,7 @@ const today = new Date().toISOString().slice(0, 10);
     <div class="admin-card">
       <h1>New Post</h1>
       <p id="form-error" class="admin-error" hidden></p>
-      <form id="post-form">
+      <form id="post-form" method="POST">
         <input type="hidden" name="csrf_token" value={csrfToken} />
         <label class="admin-field">
           <span>Title</span>

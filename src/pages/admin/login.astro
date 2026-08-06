@@ -25,7 +25,7 @@ const hasError = Astro.url.searchParams.has('error');
     <div class="admin-card">
       <h1>Admin Log in</h1>
       {hasError && <p class="admin-error">Invalid username or password.</p>}
-      <form id="login-form">
+      <form id="login-form" method="POST">
         <input type="hidden" name="csrf_token" value={csrfToken} />
         <input type="hidden" name="salt" value={salt} />
         <label class="admin-field">

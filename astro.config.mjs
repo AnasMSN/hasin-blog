@@ -15,6 +15,17 @@ export default defineConfig({
   session: {
     driver: 'memory',
   },
+  // Admin pages send a strict `script-src 'self'` CSP (see src/middleware.ts) with no
+  // 'unsafe-inline'. By default Vite inlines small per-page scripts directly into the
+  // rendered HTML instead of emitting them as separate /_astro/*.js files, which the
+  // browser then silently blocks under that CSP (the script never runs, so e.g. the
+  // login form falls back to a native GET submit — leaking the password into the URL).
+  // Forcing every script to be a real external file keeps them same-origin and CSP-safe.
+  vite: {
+    build: {
+      assetsInlineLimit: 0,
+    },
+  },
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'ko', 'id'],
