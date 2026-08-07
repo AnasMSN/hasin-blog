@@ -1,6 +1,7 @@
 ---
 import type { Lang } from '../../i18n/ui';
 import { useTranslations } from '../../i18n/utils';
+import { getPortfolio } from '../../data/portfolio';
 
 interface Props {
   lang: Lang;
@@ -8,9 +9,22 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+const projects = getPortfolio(lang);
 ---
 
-<div class="placeholder">
+<div class="portfolio-page">
   <h1>{t('portfolio.title')}</h1>
-  <p>{t('portfolio.comingSoon')}</p>
+  <div class="portfolio-grid">
+    {
+      projects.map((project) => (
+        <a class="portfolio-card" href={project.url} target="_blank" rel="noopener noreferrer">
+          <img src={project.image} alt={project.name} loading="lazy" />
+          <div class="portfolio-card-body">
+            <h2>{project.name}</h2>
+            <p>{project.description}</p>
+          </div>
+        </a>
+      ))
+    }
+  </div>
 </div>
